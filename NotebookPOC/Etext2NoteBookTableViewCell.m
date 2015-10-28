@@ -40,18 +40,8 @@ enum EditType{
 
 #pragma mark - Actions
 - (IBAction)buttonAction:(id)sender {
-    //toggle button on or off to enable or disable style
-    Etext2CustomEditUIButton *selectedButton = (Etext2CustomEditUIButton*)sender;
-    BOOL isOn = [selectedButton.userInfo[BUTTON_SELECTED] boolValue];
     
-    if(!isOn){ //on
-        [Etext2Utility setUpButtonSelectedStyle:selectedButton];
-        selectedButton.userInfo[BUTTON_SELECTED] = @(YES);
-    }else{ //off
-        [Etext2Utility setUpButtonUnSelectedStyle:selectedButton];
-        selectedButton.userInfo[BUTTON_SELECTED] = @(NO);
-    }
-
+    Etext2CustomEditUIButton *selectedButton = (Etext2CustomEditUIButton*)sender;
     
     UIView *parentView = selectedButton.superview.superview;
     UITextView *textView = (UITextView*)[parentView viewWithTag:TEXT_BOX];
@@ -62,12 +52,32 @@ enum EditType{
     
     NSRange textRange = [[allText string] rangeOfString:selectedText];
     
+    if (textRange.length <= 0) { //if nothing is selected do nothing
+        return;
+    }
     
+    //toggle button on or off to enable or disable style
+    
+    BOOL isOn = [selectedButton.userInfo[BUTTON_SELECTED] boolValue];
+    
+    if(!isOn){ //on
+        selectedButton.userInfo[BUTTON_SELECTED] = @(YES);
+        [Etext2Utility setUpButtonSelectedStyle:selectedButton];
+        isOn = YES;
+        
+    }else{ //off
+        selectedButton.userInfo[BUTTON_SELECTED] = @(NO);
+        [Etext2Utility setUpButtonUnSelectedStyle:selectedButton];
+        isOn = NO;
+    }
+
+    
+
     switch (selectedButton.tag) {
         case BOLD:
         {
             NSLog(@"BOLD ACTION SENT! %@",selectedText);
-            [self doStringAttribution:textRange fromAllText:allText formatType:Bold isOn:isOn withHandler:^(NSMutableAttributedString * formattedText) {
+            [self doStringAttribution:textRange fromAllText:allText formatType:Bold  pressedButton:selectedButton withHandler:^(NSMutableAttributedString * formattedText) {
                 textView.attributedText = formattedText;
             }];
             break;
@@ -75,7 +85,7 @@ enum EditType{
         case ITALIC:
         {
             NSLog(@"ITALIC ACTION SENT! %@",selectedText);
-            [self doStringAttribution:textRange fromAllText:allText formatType:Italic isOn:isOn withHandler:^(NSMutableAttributedString * formattedText) {
+            [self doStringAttribution:textRange fromAllText:allText formatType:Italic pressedButton:selectedButton  withHandler:^(NSMutableAttributedString * formattedText) {
                 textView.attributedText = formattedText;
             }];;
             break;
@@ -83,7 +93,7 @@ enum EditType{
         case UNDERLINE:
         {
             NSLog(@"UNDERLINE ACTION SENT! %@",selectedText);
-            [self doStringAttribution:textRange fromAllText:allText formatType:Underline isOn:isOn withHandler:^(NSMutableAttributedString * formattedText) {
+            [self doStringAttribution:textRange fromAllText:allText formatType:Underline pressedButton:selectedButton  withHandler:^(NSMutableAttributedString * formattedText) {
                 textView.attributedText = formattedText;
             }];
             break;
@@ -114,10 +124,6 @@ enum EditType{
         }
 
     }
-    
-
-    
-    
 
 }
 
@@ -228,7 +234,7 @@ enum EditType{
 
 
 
--(void)doStringAttribution:(NSRange)selectedRange fromAllText:(NSAttributedString*)allString formatType:(NSInteger)type isOn:(BOOL)isOn withHandler:(void (^)(NSMutableAttributedString*))handler{
+-(void)doStringAttribution:(NSRange)selectedRange fromAllText:(NSAttributedString*)allString formatType:(NSInteger)type pressedButton:(Etext2CustomEditUIButton*)pushedButton withHandler:(void (^)(NSMutableAttributedString*))handler{
 
     
     [allString enumerateAttributesInRange:selectedRange options:NSAttributedStringEnumerationLongestEffectiveRangeNotRequired usingBlock:^(NSDictionary *attrs, NSRange range, BOOL *stop) {
@@ -241,23 +247,24 @@ enum EditType{
         
         NSMutableArray *attributeTypes = [NSMutableArray new];
         
+        //is the button on or off
+        
+ 
         [attributeTypes addObject:@(type)]; //coming type
         
         for (id attributeType in attrs) {
             //check for any underlines
             if([attributeType isEqualToString:@"NSUnderline"]){
-                if(isOn)
                     [attributeTypes addObject:@(Underline)];
             }
             //check for existing formatting.
             if([attributeType isEqualToString:@"NSFont"]){
+                
                 if ([((UIFont*)attrs[attributeType]).fontName rangeOfString:@"HeavyOblique"].location != NSNotFound) {
                         [attributeTypes addObject:@(BoldOblique)];
                 }else if ([((UIFont*)attrs[attributeType]).fontName rangeOfString:@"Oblique"].location != NSNotFound) {
-                    if(isOn)
                         [attributeTypes addObject:@(Italic)];
                 }else if ([((UIFont*)attrs[attributeType]).fontName rangeOfString:@"Heavy"].location != NSNotFound) {
-                    if(isOn)
                         [attributeTypes addObject:@(Bold)];
                 }
             }
@@ -269,19 +276,22 @@ enum EditType{
         NSMutableAttributedString *formattedSubString = [[NSMutableAttributedString alloc] initWithString:substringForMatch];
         
         
-        if([attributeTypes containsObject:@(Bold)]){//if bold
+        if(([attributeTypes containsObject:@(Bold)] || [attributeTypes containsObject:@(BoldOblique)]) && [((Etext2CustomEditUIButton*)[pushedButton.superview viewWithTag:BOLD]).userInfo[BUTTON_SELECTED] boolValue]){//if bold
                 [formattedSubString addAttribute:NSFontAttributeName value:attributeBoldFont range:NSMakeRange(0,substringForMatch.length)];
         }
         
-        if([attributeTypes containsObject:@(Italic)]){ //oblique
+        if([attributeTypes containsObject:@(Italic)] && [((Etext2CustomEditUIButton*)[pushedButton.superview viewWithTag:ITALIC]).userInfo[BUTTON_SELECTED] boolValue]){ //oblique
             [formattedSubString addAttribute:NSFontAttributeName value:attributeObliqueFont range:NSMakeRange(0,substringForMatch.length)];
         }
         
-        if([attributeTypes containsObject:@(BoldOblique)] || ([attributeTypes containsObject:@(Italic)] && [attributeTypes containsObject:@(Bold)])){ //bold oblique
+        if(([attributeTypes containsObject:@(BoldOblique)] &&
+           ([attributeTypes containsObject:@(Italic)] && [attributeTypes containsObject:@(Bold)])) ||
+           ([((Etext2CustomEditUIButton*)[pushedButton.superview viewWithTag:BOLD]).userInfo[BUTTON_SELECTED] boolValue] &&
+           [((Etext2CustomEditUIButton*)[pushedButton.superview viewWithTag:ITALIC]).userInfo[BUTTON_SELECTED] boolValue])){ //bold oblique
             [formattedSubString addAttribute:NSFontAttributeName value:attributeBoldObliqueFont range:NSMakeRange(0,substringForMatch.length)];
         }
         
-        if([attributeTypes containsObject:@(Underline)]){//underline
+        if([attributeTypes containsObject:@(Underline)] && [((Etext2CustomEditUIButton*)[pushedButton.superview viewWithTag:UNDERLINE]).userInfo[BUTTON_SELECTED] boolValue]){//underline
             [formattedSubString addAttribute:NSUnderlineStyleAttributeName value:@(NSUnderlineStyleSingle) range:NSMakeRange(0,substringForMatch.length)];
         }
         

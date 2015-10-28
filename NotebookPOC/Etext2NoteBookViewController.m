@@ -341,6 +341,9 @@
     
     UIView *parentView = (UITableViewCell*)textView.superview;
     
+    if (textRange.length <=0) { //if nothing is selected do nothing
+        return;
+    }
     Etext2CustomEditUIButton *italicButton = (Etext2CustomEditUIButton*)[parentView viewWithTag:ITALIC];
     italicButton.userInfo[BUTTON_SELECTED] = @(NO);
     Etext2CustomEditUIButton *boldButton = (Etext2CustomEditUIButton*)[parentView viewWithTag:BOLD];
