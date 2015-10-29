@@ -7,6 +7,8 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "Etext2CustomEditUIButton.h"
+
 //delete all these fonts
 #define APPLICATION_STANDARD_FONT @"Avenir-Roman"
 #define APPLICATION_BOLD_FONT @"Avenir-Heavy"
@@ -15,23 +17,8 @@
 #define DISABLED_COLOR [UIColor colorWithRed:0.686 green:0.686 blue:0.686 alpha:1]
 #define STANDARD_BUTTON_FONT [UIFont fontWithName:kFontAwesomeFamilyName size:14]
 
-#define BOLD 1
-#define ITALIC 2
-#define UNDERLINE 3
-#define BULLET 4
-#define NUMBER_BULLET 5
-#define UNDO 6
-#define REDO 7
 
-#define DONE 11
-#define EDIT_BOX 10
-#define EDIT_BOX_INNER 200
-#define WORD_COUNT 12
-#define NOTE_TEXT 100
-#define NOTE_PROMPT 101
-#define BUTTON_BASE 99
-#define TEXT_BOX 89
-#define DATE 300
+
 
 @protocol Etext2NoteBookCellDelegate <NSObject>
 
@@ -45,4 +32,8 @@
     @property(nonatomic,weak) id <Etext2NoteBookCellDelegate> cellDelegate;
     @property(nonatomic,weak) NSString *selectedText;
 
+
+//public methods
+    -(void)buttonAction:(Etext2CustomEditUIButton*)button;
+    -(void)doStringAttribution:(NSRange)selectedRange fromAllText:(NSAttributedString*)allString withHandler:(void (^)(NSMutableAttributedString*))handler;
 @end

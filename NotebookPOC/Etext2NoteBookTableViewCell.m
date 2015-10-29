@@ -14,6 +14,7 @@
 #import "NSString+FontAwesome.h"
 #import "UIFont+FontAwesome.h"
 #import "Etext2CustomEditUIButton.h"
+#import "Etext2CustomUITextView.h"
 
 
 
@@ -38,9 +39,8 @@ enum EditType{
 
 
 #pragma mark - Actions
-- (IBAction)buttonAction:(id)sender {
-    
-    Etext2CustomEditUIButton *selectedButton = (Etext2CustomEditUIButton*)sender;
+- (void)buttonAction:(Etext2CustomEditUIButton*)selectedButton {
+
 
     UIView *parentView = selectedButton.superview.superview;
     UITextView *textView = (UITextView*)[parentView viewWithTag:TEXT_BOX];
@@ -50,50 +50,8 @@ enum EditType{
     NSAttributedString *allText = textView.attributedText;
     
     NSRange textRange = textView.selectedRange;
-    
-    if (textRange.length <= 0) { //if nothing is selected do nothing
-        return;
-    }
-    
-    //toggle button on or off to enable or disable style
-    BOOL on = [selectedButton.userInfo[BUTTON_SELECTED] boolValue];
-    
-    if(!on){ //set on
-        selectedButton.userInfo[BUTTON_SELECTED] = @(YES);
-        [Etext2Utility setUpButtonSelectedStyle:selectedButton];
-    }else{ //set off
-        selectedButton.userInfo[BUTTON_SELECTED] = @(NO);
-        [Etext2Utility setUpButtonUnSelectedStyle:selectedButton];
-    }
 
     switch (selectedButton.tag) {
-        case BOLD:
-        {
-            NSLog(@"BOLD ACTION SENT! %@",selectedText);
-            [self doStringAttribution:textRange fromAllText:allText pressedButton:selectedButton withHandler:^(NSMutableAttributedString * formattedText) {
-                textView.attributedText = formattedText;
-                [self.cellDelegate resetSelectedText:self];
-            }];
-            break;
-        }
-        case ITALIC:
-        {
-            NSLog(@"ITALIC ACTION SENT! %@",selectedText);
-            [self doStringAttribution:textRange fromAllText:allText pressedButton:selectedButton  withHandler:^(NSMutableAttributedString * formattedText) {
-                textView.attributedText = formattedText;
-                [self.cellDelegate resetSelectedText:self];
-            }];;
-            break;
-        }
-        case UNDERLINE:
-        {
-            NSLog(@"UNDERLINE ACTION SENT! %@",selectedText);
-            [self doStringAttribution:textRange fromAllText:allText pressedButton:selectedButton  withHandler:^(NSMutableAttributedString * formattedText) {
-                textView.attributedText = formattedText;
-                [self.cellDelegate resetSelectedText:self];
-            }];
-            break;
-        }
         case BULLET:
         {
             NSLog(@"BULLET ACTION SENT! %@",selectedText);
@@ -117,6 +75,13 @@ enum EditType{
             NSLog(@"REDO ACTION SENT! %@",selectedText);
 
             break;
+        }
+        default:{ //all font attribute changes B,I,U
+            [self doStringAttribution:textRange fromAllText:allText withHandler:^(NSMutableAttributedString * formattedText) {
+                textView.attributedText = formattedText;
+                [self.cellDelegate resetSelectedText:self];
+            }];
+        
         }
 
     }
@@ -230,78 +195,96 @@ enum EditType{
 
 
 
--(void)doStringAttribution:(NSRange)selectedRange fromAllText:(NSAttributedString*)allString pressedButton:(Etext2CustomEditUIButton*)pushedButton withHandler:(void (^)(NSMutableAttributedString*))handler{
+-(void)doStringAttribution:(NSRange)selectedRange fromAllText:(NSAttributedString*)allString withHandler:(void (^)(NSMutableAttributedString*))handler{
 
+    //are the other buttons on or off
+    BOOL boldOn = [((Etext2CustomEditUIButton*)[self viewWithTag:BOLD]).userInfo[BUTTON_SELECTED] boolValue];
+    BOOL italicOn =[((Etext2CustomEditUIButton*)[self viewWithTag:ITALIC]).userInfo[BUTTON_SELECTED] boolValue];
+    BOOL underlineOn =[((Etext2CustomEditUIButton*)[self viewWithTag:UNDERLINE]).userInfo[BUTTON_SELECTED] boolValue];
     
-    [allString enumerateAttributesInRange:selectedRange options:NSAttributedStringEnumerationLongestEffectiveRangeNotRequired usingBlock:^(NSDictionary *attrs, NSRange range, BOOL *stop) {
-        
-        //font types
-        UIFont *attributeBoldFont = [UIFont fontWithName:APPLICATION_BOLD_FONT size:14];
-        UIFont *attributeNormalFont = [UIFont fontWithName:APPLICATION_STANDARD_FONT size:14];
-        UIFont *attributeObliqueFont = [UIFont fontWithName:APPLICATION_STANDARD_ITALIC_FONT size:14];
-        UIFont *attributeBoldObliqueFont = [UIFont fontWithName:APPLICATION_BOLD_ITALIC_FONT size:14];
-        
-        NSMutableArray *attributeTypes = [NSMutableArray new];
-        
-        //are the other buttons on or off
-        BOOL boldOn = [((Etext2CustomEditUIButton*)[pushedButton.superview viewWithTag:BOLD]).userInfo[BUTTON_SELECTED] boolValue];
-        BOOL italicOn =[((Etext2CustomEditUIButton*)[pushedButton.superview viewWithTag:ITALIC]).userInfo[BUTTON_SELECTED] boolValue];
-        BOOL underlineOn =[((Etext2CustomEditUIButton*)[pushedButton.superview viewWithTag:UNDERLINE]).userInfo[BUTTON_SELECTED] boolValue];
-        
-//        [attributeTypes addObject:@(type)]; //coming type
-        
-        for (id attributeType in attrs) {
-            //check for any underlines
-            if(/*[attributeType isEqualToString:@"NSUnderline"] ||*/ underlineOn){
-                    [attributeTypes addObject:@(Underline)];
-            }
-            //check for existing formatting.
-            if([attributeType isEqualToString:@"NSFont"]){
-                
-                if(/*[((UIFont*)attrs[attributeType]).fontName rangeOfString:@"Oblique"].location != NSNotFound*/italicOn) {
-                        [attributeTypes addObject:@(Italic)];
-                }else if (/*[((UIFont*)attrs[attributeType]).fontName rangeOfString:@"Heavy"].location != NSNotFound*/boldOn) {
-                        [attributeTypes addObject:@(Bold)];
+    if(selectedRange.length>0) {
+        [allString enumerateAttributesInRange:selectedRange options:NSAttributedStringEnumerationLongestEffectiveRangeNotRequired usingBlock:^(NSDictionary *attrs, NSRange range, BOOL *stop) {
+            
+            //font types
+            UIFont *attributeBoldFont = [UIFont fontWithName:APPLICATION_BOLD_FONT size:STANDARD_FONT_SIZE];
+            UIFont *attributeNormalFont = [UIFont fontWithName:APPLICATION_STANDARD_FONT size:STANDARD_FONT_SIZE];
+            UIFont *attributeObliqueFont = [UIFont fontWithName:APPLICATION_STANDARD_ITALIC_FONT size:STANDARD_FONT_SIZE];
+            UIFont *attributeBoldObliqueFont = [UIFont fontWithName:APPLICATION_BOLD_ITALIC_FONT size:STANDARD_FONT_SIZE];
+            
+            NSMutableArray *attributeTypes = [NSMutableArray new];
+            
+            for (id attributeType in attrs) {
+                //check for any underlines
+                if(/*[attributeType isEqualToString:@"NSUnderline"] ||*/ underlineOn){
+                        [attributeTypes addObject:@(Underline)];
                 }
-                
-                if (/*[((UIFont*)attrs[attributeType]).fontName rangeOfString:@"HeavyOblique"].location != NSNotFound*/italicOn && boldOn) {
-                    [attributeTypes addObject:@(BoldOblique)];
+                //check for existing formatting.
+                if([attributeType isEqualToString:@"NSFont"]){
+                    
+                    if(/*[((UIFont*)attrs[attributeType]).fontName rangeOfString:@"Oblique"].location != NSNotFound*/italicOn) {
+                            [attributeTypes addObject:@(Italic)];
+                    }else if (/*[((UIFont*)attrs[attributeType]).fontName rangeOfString:@"Heavy"].location != NSNotFound*/boldOn) {
+                            [attributeTypes addObject:@(Bold)];
+                    }
+                    
+                    if (/*[((UIFont*)attrs[attributeType]).fontName rangeOfString:@"HeavyOblique"].location != NSNotFound*/italicOn && boldOn) {
+                        [attributeTypes addObject:@(BoldOblique)];
+                    }
                 }
             }
-        }
-
-        NSMutableAttributedString *formattedString = [allString mutableCopy];
         
 
+            NSMutableAttributedString *formattedString = [allString mutableCopy];
+
+            
+            NSString* substringForMatch = [[allString string] substringWithRange:selectedRange];
+            NSMutableAttributedString *formattedSubString = [[NSMutableAttributedString alloc] initWithString:substringForMatch];
+            
+            [formattedSubString addAttribute:NSFontAttributeName value:attributeNormalFont range:NSMakeRange(0,formattedSubString.length)];
+            
+            if([attributeTypes containsObject:@(Bold)]){//if bold
+                    [formattedSubString addAttribute:NSFontAttributeName value:attributeBoldFont range:NSMakeRange(0,substringForMatch.length)];
+            }
+            
+            if([attributeTypes containsObject:@(Italic)]){ //oblique
+                [formattedSubString addAttribute:NSFontAttributeName value:attributeObliqueFont range:NSMakeRange(0,substringForMatch.length)];
+            }
+            
+            if([attributeTypes containsObject:@(BoldOblique)] || ([attributeTypes containsObject:@(Bold)] && [attributeTypes containsObject:@(Italic)])){ //bold oblique
+                [formattedSubString addAttribute:NSFontAttributeName value:attributeBoldObliqueFont range:NSMakeRange(0,substringForMatch.length)];
+            }
+            
+            if([attributeTypes containsObject:@(Underline)]){//underline
+                [formattedSubString addAttribute:NSUnderlineStyleAttributeName value:@(NSUnderlineStyleSingle) range:NSMakeRange(0,substringForMatch.length)];
+            }
+            
+            [formattedString replaceCharactersInRange:selectedRange withAttributedString:formattedSubString];
+            
+            handler(formattedString);
+            
+        }];
         
-        NSString* substringForMatch = [[allString string] substringWithRange:selectedRange];
-        NSMutableAttributedString *formattedSubString = [[NSMutableAttributedString alloc] initWithString:substringForMatch];
+    }else{
         
-        [formattedSubString addAttribute:NSFontAttributeName value:attributeNormalFont range:NSMakeRange(0,formattedSubString.length)];
+        //we are typing
+        NSString *fontName;
         
-        if([attributeTypes containsObject:@(Bold)]){//if bold
-                [formattedSubString addAttribute:NSFontAttributeName value:attributeBoldFont range:NSMakeRange(0,substringForMatch.length)];
-        }
+        if(boldOn)
+            fontName= APPLICATION_BOLD_FONT;
+        if(italicOn)
+            fontName = APPLICATION_STANDARD_ITALIC_FONT;
+        if(boldOn && italicOn)
+            fontName = APPLICATION_BOLD_ITALIC_FONT;
         
-        if([attributeTypes containsObject:@(Italic)]){ //oblique
-            [formattedSubString addAttribute:NSFontAttributeName value:attributeObliqueFont range:NSMakeRange(0,substringForMatch.length)];
-        }
+        UIFont *newFont = [UIFont fontWithName:fontName size:STANDARD_FONT_SIZE];
+        Etext2CustomUITextView *textView = (Etext2CustomUITextView*)[self viewWithTag:TEXT_BOX];
+        [textView applyAttributeToTypingAttribute:newFont forKey:NSFontAttributeName];
         
-        if([attributeTypes containsObject:@(BoldOblique)] || ([attributeTypes containsObject:@(Bold)] && [attributeTypes containsObject:@(Italic)])){ //bold oblique
-            [formattedSubString addAttribute:NSFontAttributeName value:attributeBoldObliqueFont range:NSMakeRange(0,substringForMatch.length)];
-        }
+        if(underlineOn)
+            [textView applyAttributeToTypingAttribute:@(NSUnderlineStyleSingle) forKey:NSUnderlineStyleAttributeName];
         
-        if([attributeTypes containsObject:@(Underline)]){//underline
-            [formattedSubString addAttribute:NSUnderlineStyleAttributeName value:@(NSUnderlineStyleSingle) range:NSMakeRange(0,substringForMatch.length)];
-        }
-        
-        [formattedString replaceCharactersInRange:selectedRange withAttributedString:formattedSubString];
-        
-        handler(formattedString);
-        
-    }];
+    }
 
 }
-
 
 @end

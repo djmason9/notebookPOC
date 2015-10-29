@@ -45,4 +45,19 @@
     _isSelectShowing = NO;
 }
 
+
+- (void)applyAttributeToTypingAttribute:(id)attribute forKey:(NSString *)key
+{
+    NSMutableDictionary *dictionary = [self.typingAttributes mutableCopy];
+    [dictionary setObject:attribute forKey:key];
+    [self setTypingAttributes:dictionary];
+}
+
+#pragma mark - public methods
+-(void)resetSelectedRange{
+    self.selectedRange = _lastSelectedRange;
+}
+
+
+
 @end

@@ -9,6 +9,8 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 
+#define STANDARD_FONT_SIZE 14
+
 @interface Etext2Utility : NSObject
 /**
  *  This strips out any blank spaces and /n returns
@@ -37,10 +39,4 @@
 +(NSAttributedString *)stringByStrippingHTML:(NSAttributedString*)htmlString;
 
 
-
-
-
-
-+(void)setUpButtonUnSelectedStyle:(UIButton*)currentButton;
-+(void)setUpButtonSelectedStyle:(UIButton*)currentButton;
 @end

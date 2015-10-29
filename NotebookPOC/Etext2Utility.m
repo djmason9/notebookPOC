@@ -36,10 +36,10 @@
     
     htmlString = [Etext2Utility stripOutwhiteSpace:htmlString]; //strip out spaces and returns
     
-    UIFont *attributeBoldFont = [UIFont fontWithName:APPLICATION_BOLD_FONT size:14];
-    UIFont *attributeRegFont = [UIFont fontWithName:APPLICATION_STANDARD_FONT size:14];
-    UIFont *attributeObliqueFont = [UIFont fontWithName:APPLICATION_STANDARD_ITALIC_FONT size:14];
-    UIFont *attributeBoldObliqueFont = [UIFont fontWithName:APPLICATION_BOLD_ITALIC_FONT size:14];
+    UIFont *attributeBoldFont = [UIFont fontWithName:APPLICATION_BOLD_FONT size:STANDARD_FONT_SIZE];
+    UIFont *attributeRegFont = [UIFont fontWithName:APPLICATION_STANDARD_FONT size:STANDARD_FONT_SIZE];
+    UIFont *attributeObliqueFont = [UIFont fontWithName:APPLICATION_STANDARD_ITALIC_FONT size:STANDARD_FONT_SIZE];
+    UIFont *attributeBoldObliqueFont = [UIFont fontWithName:APPLICATION_BOLD_ITALIC_FONT size:STANDARD_FONT_SIZE];
     
     NSString *htmlPattern = @"(<b>(.*?)</b>|<i>(.*?)</i>|<u>(.*?)</u>)";
     
@@ -107,59 +107,5 @@
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/**
- *  Sets the background for an OFF state of a button
- *
- *  @param currentButton
- */
-+(void)setUpButtonUnSelectedStyle:(UIButton*)currentButton{
-    
-    // Create the colors
-    UIColor *topColor = [UIColor colorWithRed:0.992 green:0.992 blue:0.992 alpha:1];
-    UIColor *bottomColor = [UIColor colorWithRed:0.882 green:0.882 blue:0.882 alpha:1];
-    
-    [self doGradientWithTopcolor:topColor andBottomColor:bottomColor usingButton:currentButton];
-}
-
-/**
- *  Sets the background of an ON State of a button
- *
- *  @param currentButton
- */
-+(void)setUpButtonSelectedStyle:(UIButton*)currentButton{
-
-    // Create the colors
-    UIColor *bottomColor = [UIColor colorWithRed:0.992 green:0.992 blue:0.992 alpha:1];
-    UIColor *topColor = [UIColor colorWithRed:0.882 green:0.882 blue:0.882 alpha:1];
-    
-    [self doGradientWithTopcolor:topColor andBottomColor:bottomColor usingButton:currentButton];
-}
-
-+(void)doGradientWithTopcolor:(UIColor*)topColor andBottomColor:(UIColor*)bottomColor usingButton:(UIButton*)currentButton{
-    
-    // Create the gradient
-    CAGradientLayer *theViewGradient = [CAGradientLayer layer];
-    theViewGradient.colors = [NSArray arrayWithObjects: (id)topColor.CGColor, (id)bottomColor.CGColor, nil];
-    theViewGradient.frame = currentButton.bounds;
-    
-    //Add gradient to view
-    [currentButton.layer replaceSublayer:currentButton.layer.sublayers[0] with:theViewGradient];
-    
-}
 
 @end

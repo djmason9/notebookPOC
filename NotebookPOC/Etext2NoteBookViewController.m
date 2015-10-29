@@ -228,7 +228,7 @@
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
 
     NSDictionary *dic = self.dataSource[indexPath.row];
-    UIFont *attributeFont = [UIFont fontWithName:APPLICATION_STANDARD_FONT size:14];
+    UIFont *attributeFont = [UIFont fontWithName:APPLICATION_STANDARD_FONT size:STANDARD_FONT_SIZE];
 
     NSAttributedString *attributedText;
     NSString *noteString = dic[@"content"];
@@ -310,30 +310,39 @@
 }
 
 -(void)resetSelectedText:(UITableViewCell *)cell{
-    UITextView *textBox = ((UITextView*)[cell viewWithTag:TEXT_BOX]);
-    textBox.selectedRange = _lastSelectedRange;
+    Etext2CustomUITextView *textBox = ((Etext2CustomUITextView*)[cell viewWithTag:TEXT_BOX]);
+    [textBox resetSelectedRange];
 }
 
 #pragma mark - UITextViewDelegate
 
 - (void)textViewDidChange:(UITextView *)textView{
     
-    UITableViewCell *cell = (UITableViewCell*)textView.superview.superview.superview.superview;
+    Etext2NoteBookTableViewCell *cell = (Etext2NoteBookTableViewCell*)textView.superview.superview.superview.superview;
     
     //update count
     ((UILabel*)[cell viewWithTag:WORD_COUNT]).text = [NSString stringWithFormat:@"%ld", (long)textView.text.length];
+    
+    [cell doStringAttribution:textView.selectedRange fromAllText:textView.attributedText withHandler:^(NSMutableAttributedString * formattedString) {
+        
+        textView.attributedText = formattedString;
+        
+    }];
+    
 }
 
 - (void)textViewDidBeginEditing:(UITextView *)textView{
 
-    UITableViewCell *cell = (UITableViewCell*)textView.superview.superview.superview.superview;
+    Etext2NoteBookTableViewCell *cell = (Etext2NoteBookTableViewCell*)textView.superview.superview.superview.superview;
     [_tableView scrollToRowAtIndexPath:[_tableView indexPathForCell:cell] atScrollPosition:UITableViewScrollPositionTop animated:YES];
+    
+    
 }
 
 /**
  *  Listens for changed in the selection and sets up the buttons
  *
- *  @param textView <#textView description#>
+ *  @param textView
  */
 - (void)textViewDidChangeSelection:(UITextView *)textView{
 
@@ -346,52 +355,43 @@
         return;
     }
     
-    _lastSelectedRange = textRange;
+    ((Etext2CustomUITextView*)textView).lastSelectedRange = textRange;
     
     Etext2CustomEditUIButton *italicButton = (Etext2CustomEditUIButton*)[parentView viewWithTag:ITALIC];
-    italicButton.userInfo[BUTTON_SELECTED] = @(NO);
     Etext2CustomEditUIButton *boldButton = (Etext2CustomEditUIButton*)[parentView viewWithTag:BOLD];
-    boldButton.userInfo[BUTTON_SELECTED] = @(NO);
     Etext2CustomEditUIButton *underlineButton = (Etext2CustomEditUIButton*)[parentView viewWithTag:UNDERLINE];
-    underlineButton.userInfo[BUTTON_SELECTED] = @(NO);
 
-    
-    
-    [Etext2Utility setUpButtonUnSelectedStyle:italicButton];
-    [Etext2Utility setUpButtonUnSelectedStyle:boldButton];
-    [Etext2Utility setUpButtonUnSelectedStyle:underlineButton];
+    //turn off the buttons
+    [italicButton setUpButtonUnSelectedStyle];
+    [boldButton setUpButtonUnSelectedStyle];
+    [underlineButton setUpButtonUnSelectedStyle];
     
     [allText enumerateAttributesInRange:textRange options:NSAttributedStringEnumerationLongestEffectiveRangeNotRequired usingBlock:^(NSDictionary *attrs, NSRange range, BOOL *stop) {    
         
         for (id attributeType in attrs) {
             //check for any underlines
             if([attributeType isEqualToString:@"NSUnderline"]){
-                [Etext2Utility setUpButtonSelectedStyle:(UIButton*)[parentView viewWithTag:UNDERLINE]];
-                underlineButton.userInfo[BUTTON_SELECTED] = @(YES);
+                [underlineButton setUpButtonSelectedStyle];
             }
             //check for existing formatting.
             if([attributeType isEqualToString:@"NSFont"]){
                NSLog(@"%@",((UIFont*)attrs[attributeType]).fontName);
 
                 if ([((UIFont*)attrs[attributeType]).fontName rangeOfString:@"Oblique"].location != NSNotFound) {
-                    [Etext2Utility setUpButtonSelectedStyle:italicButton];
-                    italicButton.userInfo[BUTTON_SELECTED] = @(YES);
+                    [italicButton setUpButtonSelectedStyle];
 
                 }
                 
                 if ([((UIFont*)attrs[attributeType]).fontName rangeOfString:@"Heavy"].location != NSNotFound) {
-                    [Etext2Utility setUpButtonSelectedStyle:boldButton];
-                    boldButton.userInfo[BUTTON_SELECTED] = @(YES);
+                    [boldButton setUpButtonSelectedStyle];
 
                 }
                 
                 if ([((UIFont*)attrs[attributeType]).fontName rangeOfString:@"HeavyOblique"].location != NSNotFound) {
                     
-                    [Etext2Utility setUpButtonSelectedStyle:italicButton];
-                    [Etext2Utility setUpButtonSelectedStyle:boldButton];
+                    [italicButton setUpButtonSelectedStyle];
+                    [boldButton setUpButtonSelectedStyle];
                     
-                    boldButton.userInfo[BUTTON_SELECTED] = @(YES);
-                    italicButton.userInfo[BUTTON_SELECTED] = @(YES);
                 }
             }
         }
