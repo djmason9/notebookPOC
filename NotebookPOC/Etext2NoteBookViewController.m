@@ -21,7 +21,7 @@
 #define SERVER_PROD @"PRODUCTION"
 #define HIGHLIGHT_COLOR [UIColor colorWithRed:59.0/255.0 green:163.0/255.0 blue:255.0/255.0 alpha:1]
 
-
+#define EDIT_OPEN @"isOpen"
 
 @interface Etext2NoteBookViewController (){
 
@@ -203,7 +203,7 @@
     UILabel *date = (UILabel*)[cell viewWithTag:DATE];
     date.text = [_mdyDateFormatter stringFromDate:[self formateDate:noteDict[@"created"]]];
     
-    if(noteDict[@"isOpen"] && [noteDict[@"isOpen"] boolValue]){
+    if(noteDict[EDIT_OPEN] && [noteDict[EDIT_OPEN] boolValue]){
         editViewBox.hidden = NO;
         Etext2CustomUITextView *textView = ((Etext2CustomUITextView*)[cell viewWithTag:TEXT_BOX]);
         //reset any selected buttons
@@ -244,31 +244,27 @@
                                                  options:NSStringDrawingUsesLineFragmentOrigin
                                                  context:nil];
         
-//        NSLog(@"%f",titleRect.size.height);
-        
         if(titleRect.size.height > 58){ //more than one line
-            if (dic[@"isOpen"] && [dic[@"isOpen"] boolValue]) {
+            if (dic[EDIT_OPEN] && [dic[EDIT_OPEN] boolValue]) {
                 return 180.0;
             }
             return titleRect.size.height;
         }
         
-        
-        if (dic[@"isOpen"] && [dic[@"isOpen"] boolValue]) {
+        if (dic[EDIT_OPEN] && [dic[EDIT_OPEN] boolValue]) {
             return 180.0;
         }
-        
-        
     }
     
     return 75; //accomedates one line and a date
-    
 }
 
 #pragma mark - private methods
 -(void)resetButtons:(UITableViewCell*)cell{
+    
     for(int i=1;i<8;i++)
         [((Etext2CustomEditUIButton*)[cell viewWithTag:i]) setUpButtonUnSelectedStyle];
+    
 }
 
 #pragma mark - Table view delegate
@@ -281,17 +277,15 @@
     cell.frame = CGRectMake(0, 0, 350, cell.frame.size.height + 100);
     
     NSMutableDictionary *tempDict = [self.dataSource[indexPath.row] mutableCopy];
-    tempDict[@"isOpen"] = @(YES);
+    tempDict[EDIT_OPEN] = @(YES);
     
     self.dataSource[indexPath.row] = tempDict;
-    
 
     [tableView beginUpdates];
     [tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationNone];
     [tableView endUpdates];
     
     [_tableView scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionTop animated:YES];
-    
 }
 
 
@@ -305,7 +299,7 @@
     NSIndexPath *indexPath = [self.tableView indexPathForCell:cell];
     
     NSMutableDictionary *tempDict = [self.dataSource[indexPath.row] mutableCopy];
-    tempDict[@"isOpen"] = @(NO);
+    tempDict[EDIT_OPEN] = @(NO);
     
     self.dataSource[indexPath.row] = tempDict;
     
@@ -340,7 +334,6 @@
 
     Etext2NoteBookTableViewCell *cell = (Etext2NoteBookTableViewCell*)textView.superview.superview.superview.superview;
     [_tableView scrollToRowAtIndexPath:[_tableView indexPathForCell:cell] atScrollPosition:UITableViewScrollPositionTop animated:YES];
-    
     
 }
 
