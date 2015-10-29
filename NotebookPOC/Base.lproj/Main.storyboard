@@ -141,7 +141,7 @@
                                                                                 <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                                                             </state>
                                                                         </button>
-                                                                        <button opaque="NO" tag="4" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ye9-nU-Wyq">
+                                                                        <button opaque="NO" tag="4" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ye9-nU-Wyq" customClass="Etext2CustomEditUIButton">
                                                                             <rect key="frame" x="110" y="5" width="30" height="30"/>
                                                                             <color key="backgroundColor" red="0.90707236840000005" green="0.75805079885187954" blue="0.75368109315055976" alpha="1" colorSpace="calibratedRGB"/>
                                                                             <state key="normal" title=".">
@@ -149,7 +149,7 @@
                                                                                 <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                                                             </state>
                                                                         </button>
-                                                                        <button opaque="NO" tag="5" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="WlN-z7-hd1">
+                                                                        <button opaque="NO" tag="5" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="WlN-z7-hd1" customClass="Etext2CustomEditUIButton">
                                                                             <rect key="frame" x="139" y="5" width="30" height="30"/>
                                                                             <color key="backgroundColor" red="0.90707236840000005" green="0.75805079885187954" blue="0.75368109315055976" alpha="1" colorSpace="calibratedRGB"/>
                                                                             <state key="normal" title=".1">
@@ -157,7 +157,7 @@
                                                                                 <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                                                             </state>
                                                                         </button>
-                                                                        <button opaque="NO" tag="6" contentMode="scaleToFill" fixedFrame="YES" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="RSI-B5-djr">
+                                                                        <button opaque="NO" tag="6" contentMode="scaleToFill" fixedFrame="YES" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="RSI-B5-djr" customClass="Etext2CustomEditUIButton">
                                                                             <rect key="frame" x="177" y="5" width="30" height="30"/>
                                                                             <color key="backgroundColor" red="0.84897750449770037" green="0.86666666670000003" blue="0.76938461262871705" alpha="1" colorSpace="calibratedRGB"/>
                                                                             <state key="normal" title="&lt;">
@@ -165,7 +165,7 @@
                                                                                 <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                                                             </state>
                                                                         </button>
-                                                                        <button opaque="NO" tag="7" contentMode="scaleToFill" fixedFrame="YES" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="x3R-Bk-nKV">
+                                                                        <button opaque="NO" tag="7" contentMode="scaleToFill" fixedFrame="YES" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="x3R-Bk-nKV" customClass="Etext2CustomEditUIButton">
                                                                             <rect key="frame" x="207" y="5" width="30" height="30"/>
                                                                             <color key="backgroundColor" red="0.84897750449770037" green="0.86666666670000003" blue="0.76938461262871705" alpha="1" colorSpace="calibratedRGB"/>
                                                                             <state key="normal" title="&gt;">

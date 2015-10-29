@@ -197,7 +197,7 @@
     UITextField *label = (UITextField *)[cell viewWithTag:NOTE_TEXT];;
     label.attributedText = [Etext2Utility stringByStrippingHTML:[Etext2Utility formatHTMLString:contentString]];
     
-   UIView *editViewBox = ((UIView*)[cell viewWithTag:EDIT_BOX]);
+    UIView *editViewBox = ((UIView*)[cell viewWithTag:EDIT_BOX]);
     
     //date
     UILabel *date = (UILabel*)[cell viewWithTag:DATE];
@@ -206,8 +206,8 @@
     if(noteDict[@"isOpen"] && [noteDict[@"isOpen"] boolValue]){
         editViewBox.hidden = NO;
         Etext2CustomUITextView *textView = ((Etext2CustomUITextView*)[cell viewWithTag:TEXT_BOX]);
-
-        
+        //reset any selected buttons
+        [self resetButtons:cell];
         textView.attributedText = [Etext2Utility stringByStrippingHTML:[Etext2Utility formatHTMLString:contentString]];
         
         //get word count
@@ -264,7 +264,12 @@
     return 75; //accomedates one line and a date
     
 }
-    
+
+#pragma mark - private methods
+-(void)resetButtons:(UITableViewCell*)cell{
+    for(int i=1;i<8;i++)
+        [((Etext2CustomEditUIButton*)[cell viewWithTag:i]) setUpButtonUnSelectedStyle];
+}
 
 #pragma mark - Table view delegate
 
