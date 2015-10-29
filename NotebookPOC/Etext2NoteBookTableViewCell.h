@@ -12,6 +12,8 @@
 #define APPLICATION_BOLD_FONT @"Avenir-Heavy"
 #define APPLICATION_STANDARD_ITALIC_FONT @"Avenir-Oblique"
 #define APPLICATION_BOLD_ITALIC_FONT @"Avenir-HeavyOblique"
+#define DISABLED_COLOR [UIColor colorWithRed:0.686 green:0.686 blue:0.686 alpha:1]
+#define STANDARD_BUTTON_FONT [UIFont fontWithName:kFontAwesomeFamilyName size:14]
 
 #define BOLD 1
 #define ITALIC 2
@@ -35,6 +37,7 @@
 
 @required
 - (void)doDoneEditing:(UITableViewCell *)cell;
+- (void)resetSelectedText:(UITableViewCell *)cell;
 
 @end
 

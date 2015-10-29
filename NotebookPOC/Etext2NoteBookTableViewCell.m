@@ -17,8 +17,7 @@
 
 
 
-#define DISABLED_COLOR [UIColor colorWithRed:0.686 green:0.686 blue:0.686 alpha:1]
-#define STANDARD_BUTTON_FONT [UIFont fontWithName:kFontAwesomeFamilyName size:14]
+
 
 enum EditType{
     Bold,
@@ -42,7 +41,7 @@ enum EditType{
 - (IBAction)buttonAction:(id)sender {
     
     Etext2CustomEditUIButton *selectedButton = (Etext2CustomEditUIButton*)sender;
-    
+
     UIView *parentView = selectedButton.superview.superview;
     UITextView *textView = (UITextView*)[parentView viewWithTag:TEXT_BOX];
     UITextRange *selectedRange = [textView selectedTextRange];
@@ -50,7 +49,7 @@ enum EditType{
     NSString *selectedText = [textView textInRange:selectedRange];
     NSAttributedString *allText = textView.attributedText;
     
-    NSRange textRange = [[allText string] rangeOfString:selectedText];
+    NSRange textRange = textView.selectedRange;
     
     if (textRange.length <= 0) { //if nothing is selected do nothing
         return;
@@ -58,17 +57,14 @@ enum EditType{
     
     //toggle button on or off to enable or disable style
     
-    BOOL isOn = [selectedButton.userInfo[BUTTON_SELECTED] boolValue];
+    BOOL on = [selectedButton.userInfo[BUTTON_SELECTED] boolValue];
     
-    if(!isOn){ //on
+    if(!on){ //set on
         selectedButton.userInfo[BUTTON_SELECTED] = @(YES);
         [Etext2Utility setUpButtonSelectedStyle:selectedButton];
-        isOn = YES;
-        
-    }else{ //off
+    }else{ //set off
         selectedButton.userInfo[BUTTON_SELECTED] = @(NO);
         [Etext2Utility setUpButtonUnSelectedStyle:selectedButton];
-        isOn = NO;
     }
 
     
@@ -79,6 +75,7 @@ enum EditType{
             NSLog(@"BOLD ACTION SENT! %@",selectedText);
             [self doStringAttribution:textRange fromAllText:allText formatType:Bold  pressedButton:selectedButton withHandler:^(NSMutableAttributedString * formattedText) {
                 textView.attributedText = formattedText;
+                [self.cellDelegate resetSelectedText:self];
             }];
             break;
         }
@@ -87,6 +84,7 @@ enum EditType{
             NSLog(@"ITALIC ACTION SENT! %@",selectedText);
             [self doStringAttribution:textRange fromAllText:allText formatType:Italic pressedButton:selectedButton  withHandler:^(NSMutableAttributedString * formattedText) {
                 textView.attributedText = formattedText;
+                [self.cellDelegate resetSelectedText:self];
             }];;
             break;
         }
@@ -95,6 +93,7 @@ enum EditType{
             NSLog(@"UNDERLINE ACTION SENT! %@",selectedText);
             [self doStringAttribution:textRange fromAllText:allText formatType:Underline pressedButton:selectedButton  withHandler:^(NSMutableAttributedString * formattedText) {
                 textView.attributedText = formattedText;
+                [self.cellDelegate resetSelectedText:self];
             }];
             break;
         }
@@ -272,9 +271,12 @@ enum EditType{
 
         NSMutableAttributedString *formattedString = [allString mutableCopy];
         
+
+        
         NSString* substringForMatch = [[allString string] substringWithRange:selectedRange];
         NSMutableAttributedString *formattedSubString = [[NSMutableAttributedString alloc] initWithString:substringForMatch];
         
+        [formattedSubString addAttribute:NSFontAttributeName value:attributeNormalFont range:NSMakeRange(0,formattedSubString.length)];
         
         if(([attributeTypes containsObject:@(Bold)] || [attributeTypes containsObject:@(BoldOblique)]) && [((Etext2CustomEditUIButton*)[pushedButton.superview viewWithTag:BOLD]).userInfo[BUTTON_SELECTED] boolValue]){//if bold
                 [formattedSubString addAttribute:NSFontAttributeName value:attributeBoldFont range:NSMakeRange(0,substringForMatch.length)];

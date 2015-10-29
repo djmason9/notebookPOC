@@ -12,4 +12,6 @@
 
 @interface Etext2NoteBookViewController : UIViewController  <UITableViewDelegate, UITableViewDataSource,Etext2NoteBookCellDelegate,UITextViewDelegate>
 
+    @property (nonatomic,assign) NSRange lastSelectedRange;
+
 @end

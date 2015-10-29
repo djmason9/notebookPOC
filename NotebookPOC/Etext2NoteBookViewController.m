@@ -26,8 +26,7 @@
 @interface Etext2NoteBookViewController (){
 
     NSString *_noteBookAPI;
-    BOOL keyboardIsShown;
-
+    BOOL _keyboardIsShown;
     
     NSString *_bookId;
     NSString *_pageId;
@@ -207,6 +206,7 @@
     if(noteDict[@"isOpen"] && [noteDict[@"isOpen"] boolValue]){
         editViewBox.hidden = NO;
         Etext2CustomUITextView *textView = ((Etext2CustomUITextView*)[cell viewWithTag:TEXT_BOX]);
+
         
         textView.attributedText = [Etext2Utility stringByStrippingHTML:[Etext2Utility formatHTMLString:contentString]];
         
@@ -307,7 +307,11 @@
     [_tableView beginUpdates];
     [_tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationNone];
     [_tableView endUpdates];
+}
 
+-(void)resetSelectedText:(UITableViewCell *)cell{
+    UITextView *textBox = ((UITextView*)[cell viewWithTag:TEXT_BOX]);
+    textBox.selectedRange = _lastSelectedRange;
 }
 
 #pragma mark - UITextViewDelegate
@@ -332,18 +336,18 @@
  *  @param textView <#textView description#>
  */
 - (void)textViewDidChangeSelection:(UITextView *)textView{
-    
-    UITextRange *selectedRange = textView.selectedTextRange;
-    
-    NSString *selectedText = [textView textInRange:selectedRange];
+
     NSAttributedString *allText = textView.attributedText;
-    NSRange textRange = [[allText string] rangeOfString:selectedText];
+    NSRange textRange = textView.selectedRange;
     
     UIView *parentView = (UITableViewCell*)textView.superview;
     
     if (textRange.length <=0) { //if nothing is selected do nothing
         return;
     }
+    
+    _lastSelectedRange = textRange;
+    
     Etext2CustomEditUIButton *italicButton = (Etext2CustomEditUIButton*)[parentView viewWithTag:ITALIC];
     italicButton.userInfo[BUTTON_SELECTED] = @(NO);
     Etext2CustomEditUIButton *boldButton = (Etext2CustomEditUIButton*)[parentView viewWithTag:BOLD];
@@ -400,7 +404,7 @@
 #pragma mark - keyboard notifications
 - (void)keyboardWillShow:(NSNotification *)notification
 {
-    if (keyboardIsShown) {
+    if (_keyboardIsShown) {
         return;
     }
     
@@ -416,7 +420,7 @@
         [self.tableViewBottomConstraint setConstant: positionDifference];
         [self.view layoutIfNeeded];
     } completion:^(BOOL finished) {
-        keyboardIsShown = YES;
+        _keyboardIsShown = YES;
     }];
 }
 
@@ -428,7 +432,7 @@
         [self.view layoutIfNeeded];
         
     } completion:^(BOOL finished) {
-        keyboardIsShown = NO;
+        _keyboardIsShown = NO;
     }];
 }
 

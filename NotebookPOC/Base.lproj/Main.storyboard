@@ -200,7 +200,7 @@
                                                                 <textView clipsSubviews="YES" multipleTouchEnabled="YES" tag="89" contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="7Xg-7g-iq7" customClass="Etext2CustomUITextView">
                                                                     <rect key="frame" x="0.0" y="40" width="325" height="60"/>
                                                                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                                                    <fontDescription key="fontDescription" name="Avenir-Book" family="Avenir" pointSize="13"/>
+                                                                    <fontDescription key="fontDescription" name="Avenir-Book" family="Avenir" pointSize="14"/>
                                                                     <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                                                                     <connections>
                                                                         <outlet property="delegate" destination="2rR-xm-17c" id="PW5-eh-yfd"/>

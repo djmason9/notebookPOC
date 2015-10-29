@@ -37,7 +37,7 @@
     htmlString = [Etext2Utility stripOutwhiteSpace:htmlString]; //strip out spaces and returns
     
     UIFont *attributeBoldFont = [UIFont fontWithName:APPLICATION_BOLD_FONT size:14];
-//    UIFont *attributeRegFont = [UIFont fontWithName:APPLICATION_STANDARD_FONT size:14];
+    UIFont *attributeRegFont = [UIFont fontWithName:APPLICATION_STANDARD_FONT size:14];
     UIFont *attributeObliqueFont = [UIFont fontWithName:APPLICATION_STANDARD_ITALIC_FONT size:14];
     UIFont *attributeBoldObliqueFont = [UIFont fontWithName:APPLICATION_BOLD_ITALIC_FONT size:14];
     
@@ -51,10 +51,14 @@
    
     NSMutableAttributedString *formattedString = [[NSMutableAttributedString alloc] initWithString:htmlString];
     
+    [formattedString addAttribute:NSFontAttributeName value:attributeRegFont range:NSMakeRange(0,formattedString.length)]; //set every font to standard height first
+    
     for (NSTextCheckingResult *match in matches) {
         
         NSString* substringForMatch = [htmlString substringWithRange:match.range];
         NSMutableAttributedString *formattedSubString = [[NSMutableAttributedString alloc] initWithString:substringForMatch];
+        
+         [formattedSubString addAttribute:NSFontAttributeName value:attributeRegFont range:NSMakeRange(0,formattedSubString.length)]; //set every font to standard height first
         
 //        NSLog(@"Extracted URL: %@",substringForMatch);
         
