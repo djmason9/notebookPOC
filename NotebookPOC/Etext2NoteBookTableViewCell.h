@@ -15,7 +15,8 @@
 #define APPLICATION_STANDARD_ITALIC_FONT @"Avenir-Oblique"
 #define APPLICATION_BOLD_ITALIC_FONT @"Avenir-HeavyOblique"
 #define DISABLED_COLOR [UIColor colorWithRed:0.686 green:0.686 blue:0.686 alpha:1]
-#define STANDARD_BUTTON_FONT [UIFont fontWithName:kFontAwesomeFamilyName size:14]
+#define ENABLED_COLOR [UIColor colorWithRed:0.26 green:0.26 blue:0.26 alpha:1.0]
+
 
 
 
@@ -25,7 +26,8 @@
 @required
 - (void)doDoneEditing:(UITableViewCell *)cell;
 - (void)resetSelectedText:(UITableViewCell *)cell;
-
+- (void)doUndo:(UITableViewCell *)cell;
+- (void)doRedo:(UITableViewCell *)cell;
 @end
 
 @interface Etext2NoteBookTableViewCell : UITableViewCell

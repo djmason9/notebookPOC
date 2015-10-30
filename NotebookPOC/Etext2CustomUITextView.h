@@ -14,4 +14,5 @@
 
     -(void)resetSelectedRange;
     - (void)applyAttributeToTypingAttribute:(id)attribute forKey:(NSString *)key;
+
 @end

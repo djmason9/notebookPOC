@@ -11,8 +11,6 @@
 #import "AFNetworking.h"
 #import "Etext2Utility.h"
 #import "Etext2NoteBookTableViewCell.h"
-#import "NSString+FontAwesome.h"
-#import "UIFont+FontAwesome.h"
 #import "Etext2CustomEditUIButton.h"
 #import "Etext2CustomUITextView.h"
 
@@ -33,24 +31,24 @@ enum EditType{
     // Initialization code
     
     [self hydrateCell];
-    
-    
 }
 
 
 #pragma mark - Actions
 - (void)buttonAction:(Etext2CustomEditUIButton*)selectedButton {
 
-
+    
+    
     UIView *parentView = selectedButton.superview.superview;
-    UITextView *textView = (UITextView*)[parentView viewWithTag:TEXT_BOX];
+    Etext2CustomUITextView *textView = (Etext2CustomUITextView*)[parentView viewWithTag:TEXT_BOX];
     UITextRange *selectedRange = [textView selectedTextRange];
     
     NSString *selectedText = [textView textInRange:selectedRange];
     NSAttributedString *allText = textView.attributedText;
     
     NSRange textRange = textView.selectedRange;
-
+   
+    
     switch (selectedButton.tag) {
         case BULLET:
         {
@@ -66,14 +64,14 @@ enum EditType{
         }
         case UNDO:
         {
-            NSLog(@"UNDO ACTION SENT! %@",selectedText);
-
+            NSLog(@"UNDO ACTION SENT!");
+            [self.cellDelegate doUndo:self];
             break;
         }
         case REDO:
         {
-            NSLog(@"REDO ACTION SENT! %@",selectedText);
-
+            NSLog(@"REDO ACTION SENT!");
+            [self.cellDelegate doRedo:self];
             break;
         }
         default:{ //all font attribute changes B,I,U
@@ -87,6 +85,8 @@ enum EditType{
     }
 
 }
+
+
 
 - (IBAction)doneEditingNote:(id)sender {
     
@@ -104,54 +104,11 @@ enum EditType{
     
     UIView *buttonBase = ((UIView*)[self viewWithTag:BUTTON_BASE]);
     [self setViewGradient:buttonBase];
-    
+
+    // BUTTONS
     UIButton *done = ((UIButton*)[self viewWithTag:DONE]);
     done.layer.backgroundColor = [UIColor blackColor].CGColor;
-    
-    UIButton *bold = ((UIButton*)[self viewWithTag:BOLD]);
-    bold.titleLabel.font = STANDARD_BUTTON_FONT;
-    [bold setTitle:[NSString fontAwesomeIconStringForEnum:FABold] forState:UIControlStateNormal];
-    
-    [self setUpButtonStyle:bold];
-    
-    UIButton *italic = ((UIButton*)[self viewWithTag:ITALIC]);
-    italic.titleLabel.font = STANDARD_BUTTON_FONT;
-    [italic setTitle:[NSString fontAwesomeIconStringForEnum:FAItalic] forState:UIControlStateNormal];
-    
-    [self setUpButtonStyle:italic];
-    
-    UIButton *underline = ((UIButton*)[self viewWithTag:UNDERLINE]);
-    underline.titleLabel.font = STANDARD_BUTTON_FONT;
-    [underline setTitle:[NSString fontAwesomeIconStringForEnum:FAUnderline] forState:UIControlStateNormal];
-    
-    [self setUpButtonStyle:underline];
-    
-    UIButton *bullet = ((UIButton*)[self viewWithTag:BULLET]);
-    bullet.titleLabel.font = STANDARD_BUTTON_FONT;
-    [bullet setTitle:[NSString fontAwesomeIconStringForEnum:FAList] forState:UIControlStateNormal];
-    
-    [self setUpButtonStyle:bullet];
-    
-    UIButton *orderedList = ((UIButton*)[self viewWithTag:NUMBER_BULLET]);
-    orderedList.titleLabel.font = STANDARD_BUTTON_FONT;
-    [orderedList setTitle:[NSString fontAwesomeIconStringForEnum:FAListOl] forState:UIControlStateNormal];
-    
-    [self setUpButtonStyle:orderedList];
-    
-    //disabled
-    UIButton *undo = ((UIButton*)[self viewWithTag:UNDO]);
-    undo.titleLabel.font = STANDARD_BUTTON_FONT;
-    [undo setTitle:[NSString fontAwesomeIconStringForEnum:FAReply] forState:UIControlStateNormal];
-    [undo setTitleColor:DISABLED_COLOR forState:UIControlStateNormal /*#afafaf*/];
-    
-    [self setUpButtonStyle:undo];
-    
-    UIButton *redo = ((UIButton*)[self viewWithTag:REDO]);
-    redo.titleLabel.font = STANDARD_BUTTON_FONT;
-    [redo setTitle:[NSString fontAwesomeIconStringForEnum:FAShare] forState:UIControlStateNormal];
-    [redo setTitleColor:DISABLED_COLOR forState:UIControlStateNormal /*#afafaf*/];
-    
-    [self setUpButtonStyle:redo];
+
 }
 
 -(void)setUpButtonStyle:(UIButton*)currentButton{
@@ -170,7 +127,6 @@ enum EditType{
     currentButton.layer.shadowPath = shadowPath.CGPath;
     
     [self setViewGradient:currentButton];
-    
 }
 /**
  *  sets the inital background gradients for UIView
@@ -179,21 +135,15 @@ enum EditType{
  */
 -(void)setViewGradient:(UIView*)currentView{
     
-    // Create the colors
-    UIColor *topColor = [UIColor colorWithRed:0.992 green:0.992 blue:0.992 alpha:1];
-    UIColor *bottomColor = [UIColor colorWithRed:0.882 green:0.882 blue:0.882 alpha:1];
-    
     // Create the gradient
     CAGradientLayer *theViewGradient = [CAGradientLayer layer];
-    theViewGradient.colors = [NSArray arrayWithObjects: (id)topColor.CGColor, (id)bottomColor.CGColor, nil];
+    theViewGradient.colors = [NSArray arrayWithObjects: (id)TOP_COLOR.CGColor, (id)BOTTOM_COLOR.CGColor, nil];
     theViewGradient.frame = currentView.bounds;
     
     //Add gradient to view
     [currentView.layer insertSublayer:theViewGradient atIndex:0];
     
 }
-
-
 
 -(void)doStringAttribution:(NSRange)selectedRange fromAllText:(NSAttributedString*)allString withHandler:(void (^)(NSMutableAttributedString*))handler{
 

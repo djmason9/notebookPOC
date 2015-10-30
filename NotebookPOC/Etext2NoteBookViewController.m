@@ -32,8 +32,7 @@
     NSString *_pageId;
     NSString *_userId;
 }
-
-
+@property (weak, nonatomic) UITextView *currentInputTextField;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *tableViewBottomConstraint;
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 @property (strong,nonatomic) NSMutableArray *dataSource;
@@ -267,6 +266,17 @@
     
 }
 
+//does actual undo
+- (void)undoTextFieldEdit: (NSAttributedString*)string
+{
+    //registers every key stroke or action
+    [self.undoManager registerUndoWithTarget:self
+                                    selector:@selector(undoTextFieldEdit:)
+                                      object:self.currentInputTextField.attributedText];
+    
+    self.currentInputTextField.attributedText = string;
+}
+
 #pragma mark - Table view delegate
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
@@ -289,7 +299,24 @@
 }
 
 
-#pragma mark - note actions
+#pragma mark - note actions from Cell Delegate
+
+- (void)doUndo:(UITableViewCell *)cell{
+    
+    [self.undoManager undo];
+    
+    if([self.undoManager canUndo])
+        [((Etext2CustomEditUIButton*)[cell viewWithTag:UNDO]) setButtonEnableState:YES];
+    else
+        [((Etext2CustomEditUIButton*)[cell viewWithTag:UNDO]) setButtonEnableState:NO];
+    
+    
+    
+}
+- (void)doRedo:(UITableViewCell *)cell{
+    [self.undoManager redo];
+}
+
 - (void)doDoneEditing:(UITableViewCell *)cell {
 
     cell.frame = CGRectMake(0, 0, 350, cell.frame.size.height - 100);
@@ -309,6 +336,7 @@
 }
 
 -(void)resetSelectedText:(UITableViewCell *)cell{
+    
     Etext2CustomUITextView *textBox = ((Etext2CustomUITextView*)[cell viewWithTag:TEXT_BOX]);
     [textBox resetSelectedRange];
 }
@@ -322,19 +350,30 @@
     //update count
     ((UILabel*)[cell viewWithTag:WORD_COUNT]).text = [NSString stringWithFormat:@"%ld", (long)textView.text.length];
     
-    [cell doStringAttribution:textView.selectedRange fromAllText:textView.attributedText withHandler:^(NSMutableAttributedString * formattedString) {
-        
-        textView.attributedText = formattedString;
-        
-    }];
+    [cell doStringAttribution:textView.selectedRange fromAllText:textView.attributedText withHandler:nil];
     
+    [((Etext2CustomEditUIButton*)[cell viewWithTag:UNDO]) setButtonEnableState:YES];
 }
 
+- (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text{
+    
+    //listen for every action happening in the text box
+    [self.undoManager registerUndoWithTarget:self
+                                    selector:@selector(undoTextFieldEdit:)
+                                      object:textView.attributedText];
+    
+     NSLog(@"Can undo: %@",textView.text);
+    
+    return YES;
+}
 - (void)textViewDidBeginEditing:(UITextView *)textView{
 
     Etext2NoteBookTableViewCell *cell = (Etext2NoteBookTableViewCell*)textView.superview.superview.superview.superview;
     [_tableView scrollToRowAtIndexPath:[_tableView indexPathForCell:cell] atScrollPosition:UITableViewScrollPositionTop animated:YES];
     
+    //a new box has been chosen
+    self.currentInputTextField = textView;
+    [self.undoManager removeAllActions]; //clear out old undos
 }
 
 /**

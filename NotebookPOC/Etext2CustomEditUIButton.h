@@ -7,6 +7,8 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "NSString+FontAwesome.h"
+#import "UIFont+FontAwesome.h"
 
 #define BUTTON_SELECTED @"isSelected"
 //buttons
@@ -28,11 +30,16 @@
 #define TEXT_BOX 89
 #define DATE 300
 
+#define STANDARD_BUTTON_FONT [UIFont fontWithName:kFontAwesomeFamilyName size:14]
+#define  TOP_COLOR  [UIColor colorWithRed:0.992 green:0.992 blue:0.992 alpha:1]
+#define  BOTTOM_COLOR  [UIColor colorWithRed:0.882 green:0.882 blue:0.882 alpha:1]
+
 @interface Etext2CustomEditUIButton : UIButton
 
 @property (nonatomic,strong) NSMutableDictionary *userInfo;
 
 -(void)setUpButtonUnSelectedStyle;
 -(void)setUpButtonSelectedStyle;
+-(void)setButtonEnableState:(BOOL)isEnabled;
 
 @end

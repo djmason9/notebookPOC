@@ -21,10 +21,10 @@
     self = [super initWithCoder:coder];
     if (self) {
         _isSelectShowing= NO;
+
     }
     return self;
 }
-
 
 - (BOOL) canPerformAction:(SEL)action withSender:(id)sender
 {
@@ -46,12 +46,16 @@
 }
 
 
+
 - (void)applyAttributeToTypingAttribute:(id)attribute forKey:(NSString *)key
 {
     NSMutableDictionary *dictionary = [self.typingAttributes mutableCopy];
     [dictionary setObject:attribute forKey:key];
     [self setTypingAttributes:dictionary];
 }
+
+
+
 
 #pragma mark - public methods
 -(void)resetSelectedRange{
