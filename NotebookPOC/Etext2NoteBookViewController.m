@@ -300,6 +300,9 @@
 
 
 #pragma mark - note actions from Cell Delegate
+- (void)attributeButtonPressed{
+    [self undoTextFieldEdit:self.currentInputTextField.attributedText];
+}
 
 - (void)doUndo:(UITableViewCell *)cell{
     
@@ -315,6 +318,11 @@
 }
 - (void)doRedo:(UITableViewCell *)cell{
     [self.undoManager redo];
+    
+    if([self.undoManager canRedo])
+        [((Etext2CustomEditUIButton*)[cell viewWithTag:REDO]) setButtonEnableState:YES];
+    else
+        [((Etext2CustomEditUIButton*)[cell viewWithTag:REDO]) setButtonEnableState:NO];
 }
 
 - (void)doDoneEditing:(UITableViewCell *)cell {
@@ -357,10 +365,8 @@
 
 - (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text{
     
-    //listen for every action happening in the text box
-    [self.undoManager registerUndoWithTarget:self
-                                    selector:@selector(undoTextFieldEdit:)
-                                      object:textView.attributedText];
+    //listen for every action happening in the text box  
+    [self undoTextFieldEdit:textView.attributedText];
     
      NSLog(@"Can undo: %@",textView.text);
     

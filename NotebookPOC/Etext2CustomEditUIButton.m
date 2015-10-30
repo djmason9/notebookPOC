@@ -48,7 +48,6 @@
                 break;
             default:
                 font = FASearch;
-                
         }
 
         //create button look

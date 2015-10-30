@@ -76,14 +76,13 @@ enum EditType{
         }
         default:{ //all font attribute changes B,I,U
             [self doStringAttribution:textRange fromAllText:allText withHandler:^(NSMutableAttributedString * formattedText) {
+                [self.cellDelegate attributeButtonPressed];
                 textView.attributedText = formattedText;
                 [self.cellDelegate resetSelectedText:self];
             }];
         
         }
-
     }
-
 }
 
 

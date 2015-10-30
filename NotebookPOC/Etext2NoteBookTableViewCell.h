@@ -28,6 +28,7 @@
 - (void)resetSelectedText:(UITableViewCell *)cell;
 - (void)doUndo:(UITableViewCell *)cell;
 - (void)doRedo:(UITableViewCell *)cell;
+- (void)attributeButtonPressed;
 @end
 
 @interface Etext2NoteBookTableViewCell : UITableViewCell
