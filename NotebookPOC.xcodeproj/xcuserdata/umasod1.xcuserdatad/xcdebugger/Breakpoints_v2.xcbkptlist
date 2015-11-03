@@ -6,15 +6,15 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "NotebookPOC/Etext2NoteBookTableViewCell.m"
-            timestampString = "468219579.246496"
+            timestampString = "468269813.490829"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "260"
-            endingLineNumber = "260"
+            startingLineNumber = "310"
+            endingLineNumber = "310"
             landmarkName = "-doStringAttribution:fromAllText:withHandler:"
             landmarkType = "5">
          </BreakpointContent>
@@ -25,13 +25,29 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "NotebookPOC/Etext2NoteBookTableViewCell.m"
-            timestampString = "468220500.212966"
+            filePath = "NotebookPOC/Etext2NoteBookViewController.m"
+            timestampString = "468269847.399002"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "213"
-            endingLineNumber = "213"
-            landmarkName = "-doStringAttribution:fromAllText:withHandler:"
+            startingLineNumber = "417"
+            endingLineNumber = "417"
+            landmarkName = "-textViewDidChangeSelection:"
+            landmarkType = "5">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "NotebookPOC/Etext2NoteBookViewController.m"
+            timestampString = "468269857.616256"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "423"
+            endingLineNumber = "423"
+            landmarkName = "-textViewDidChangeSelection:"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>

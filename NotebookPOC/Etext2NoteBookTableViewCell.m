@@ -41,9 +41,9 @@ enum EditType{
     
     UIView *parentView = selectedButton.superview.superview;
     Etext2CustomUITextView *textView = (Etext2CustomUITextView*)[parentView viewWithTag:TEXT_BOX];
-    UITextRange *selectedRange = [textView selectedTextRange];
+//    UITextRange *selectedRange = [textView selectedTextRange];
     
-    NSString *selectedText = [textView textInRange:selectedRange];
+//    NSString *selectedText = [textView textInRange:selectedRange];
     NSAttributedString *allText = textView.attributedText;
     
     NSRange textRange = textView.selectedRange;
@@ -56,12 +56,12 @@ enum EditType{
 //
 //            break;
 //        }
-        case NUMBER_BULLET:
-        {
-            NSLog(@"NUMBER BULLET ACTION SENT! %@",selectedText);
-
-            break;
-        }
+//        case NUMBER_BULLET:
+//        {
+//            NSLog(@"NUMBER BULLET ACTION SENT! %@",selectedText);
+//
+//            break;
+//        }
         case UNDO:
         {
             NSLog(@"UNDO ACTION SENT!");
@@ -152,6 +152,7 @@ enum EditType{
     BOOL underlineOn =[((Etext2CustomEditUIButton*)[self viewWithTag:UNDERLINE]).userInfo[BUTTON_SELECTED] boolValue];
     
     BOOL bulletOn = [((Etext2CustomEditUIButton*)[self viewWithTag:BULLET]).userInfo[BUTTON_SELECTED] boolValue];
+    BOOL orderedBulletOn = [((Etext2CustomEditUIButton*)[self viewWithTag:NUMBER_BULLET]).userInfo[BUTTON_SELECTED] boolValue];
     
     if(selectedRange.length>0) {
         [allString enumerateAttributesInRange:selectedRange options:NSAttributedStringEnumerationLongestEffectiveRangeNotRequired usingBlock:^(NSDictionary *attrs, NSRange range, BOOL *stop) {
@@ -195,22 +196,71 @@ enum EditType{
             if([substringForMatch rangeOfString:@"\u25E6"].location != NSNotFound){
                 substringForMatch = [substringForMatch stringByReplacingOccurrencesOfString:@"\u25E6\t" withString:@""];
                 formattedSubString = [[NSMutableAttributedString alloc] initWithString:substringForMatch];
+                
+            }else if([substringForMatch rangeOfString:@".\t"].location != NSNotFound){ //removes numbers and tabs
+
+                while ((range = [[formattedSubString mutableString] rangeOfString:@"[0-9]+.+\t" options:NSRegularExpressionSearch]).location != NSNotFound)
+                {
+                    [[formattedSubString mutableString] replaceCharactersInRange:range withString:@""];
+                }
+                
             }
          
-            if(bulletOn){
+            if(bulletOn || orderedBulletOn){
                 NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
                 [paragraphStyle setParagraphSpacing:3];
                 paragraphStyle.headIndent = STANDARD_FONT_SIZE *2;
                 paragraphStyle.firstLineHeadIndent = STANDARD_FONT_SIZE;
+            
                 
                 NSTextTab *listTab = [[NSTextTab alloc] initWithTextAlignment:NSTextAlignmentNatural
                                                                      location:STANDARD_FONT_SIZE * 2
                                                                       options:nil];
                 paragraphStyle.tabStops = @[listTab];
                 
+                if (bulletOn){
+                    BOOL breaksFound = NO;
+                    //if the string has \n in it use those to add bullets to first pos \u25E6\t and \n\u25E6\t
+                    while ((range = [[formattedSubString mutableString] rangeOfString:@"\n" options:NSRegularExpressionSearch]).location != NSNotFound)
+                    {
+                        breaksFound= YES;
+                        [[formattedSubString mutableString] replaceCharactersInRange:range withString:@"\u25E6"];
+                    }
+                    
+                    //add a bullet at first pos if the \n were in the string
+                    if(breaksFound){
+                        
+                        substringForMatch = [NSString stringWithFormat:@"\u25E6%@",[formattedSubString string]];
+                        formattedSubString = [[NSMutableAttributedString alloc] initWithString:substringForMatch];
+                        //now fix all the spacing issues with the tabs
+                        NSString *holdingString=@"";
+                        NSInteger count =0;
+                        for(NSString *str  in [[formattedSubString string] componentsSeparatedByString:@"\u25E6"]){
+                           
+                            if(![str isEqualToString:@""] && count >0){ //no blanks and not the first
+                                holdingString = [holdingString stringByAppendingString:[NSString stringWithFormat:@"\n\u25E6\t%@",str]];
+                                
+                            }else if(![str isEqualToString:@""] && count == 0){ //first line dont want a return
+                                holdingString = [holdingString stringByAppendingString:[NSString stringWithFormat:@"\u25E6\t%@",str]];
+                                count++;
+                            }
+                        }
+                        
+                        formattedSubString = [[NSMutableAttributedString alloc] initWithString:holdingString];
+                        
+                    }
+                    //only do this if its a clean string no \n or\t or \u25E6 in the string
+                    else if([substringForMatch rangeOfString:@"\n"].location == NSNotFound){ //no returns found
+                        substringForMatch = [NSString stringWithFormat:@"\u25E6\t%@",substringForMatch];
+                        formattedSubString = [[NSMutableAttributedString alloc] initWithString:substringForMatch];
+                    }
                 
-                substringForMatch = [NSString stringWithFormat:@"\u25E6\t%@",substringForMatch];
-                formattedSubString = [[NSMutableAttributedString alloc] initWithString:substringForMatch];
+                }
+                else{
+                    substringForMatch = [NSString stringWithFormat:@"1.\t%@",substringForMatch];
+                }
+                
+//                formattedSubString = [[NSMutableAttributedString alloc] initWithString:substringForMatch];
                 
                 [formattedSubString addAttributes:@{NSParagraphStyleAttributeName: paragraphStyle} range:NSMakeRange(0,substringForMatch.length)];
             }

@@ -404,6 +404,8 @@
     Etext2CustomEditUIButton *italicButton = (Etext2CustomEditUIButton*)[parentView viewWithTag:ITALIC];
     Etext2CustomEditUIButton *boldButton = (Etext2CustomEditUIButton*)[parentView viewWithTag:BOLD];
     Etext2CustomEditUIButton *underlineButton = (Etext2CustomEditUIButton*)[parentView viewWithTag:UNDERLINE];
+    Etext2CustomEditUIButton *bulletButton = (Etext2CustomEditUIButton*)[parentView viewWithTag:BULLET];
+    Etext2CustomEditUIButton *numberBulletButton = (Etext2CustomEditUIButton*)[parentView viewWithTag:NUMBER_BULLET];
 
     //turn off the buttons
     [italicButton setUpButtonUnSelectedStyle];
@@ -416,6 +418,9 @@
             //check for any underlines
             if([attributeType isEqualToString:@"NSUnderline"]){
                 [underlineButton setUpButtonSelectedStyle];
+            }
+            if([attributeType isEqualToString:@"NSParagraphStyle"]){
+                [bulletButton setUpButtonSelectedStyle];
             }
             //check for existing formatting.
             if([attributeType isEqualToString:@"NSFont"]){
