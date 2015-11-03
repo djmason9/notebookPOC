@@ -239,15 +239,16 @@
     if ( noteString != nil && [noteString length] > 0 )
     {
         attributedText = [[NSAttributedString alloc] initWithString:noteString attributes:@{NSFontAttributeName: attributeFont}];
+        attributedText= [Etext2Utility stringByStrippingHTML:attributedText];
         titleRect = [attributedText boundingRectWithSize:(CGSize){350, CGFLOAT_MAX}
                                                  options:NSStringDrawingUsesLineFragmentOrigin
                                                  context:nil];
         
-        if(titleRect.size.height > 58){ //more than one line
+        if(titleRect.size.height > 55){ //more than one line
             if (dic[EDIT_OPEN] && [dic[EDIT_OPEN] boolValue]) {
                 return 180.0;
             }
-            return titleRect.size.height;
+            return titleRect.size.height+30; //account for the date
         }
         
         if (dic[EDIT_OPEN] && [dic[EDIT_OPEN] boolValue]) {

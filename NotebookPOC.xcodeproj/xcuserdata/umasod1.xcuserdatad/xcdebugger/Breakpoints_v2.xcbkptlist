@@ -9,13 +9,29 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "NotebookPOC/Etext2NoteBookViewController.m"
-            timestampString = "467931930.480682"
+            filePath = "NotebookPOC/Etext2NoteBookTableViewCell.m"
+            timestampString = "468219579.246496"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "311"
-            endingLineNumber = "311"
-            landmarkName = "-doUndo:"
+            startingLineNumber = "260"
+            endingLineNumber = "260"
+            landmarkName = "-doStringAttribution:fromAllText:withHandler:"
+            landmarkType = "5">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "NotebookPOC/Etext2NoteBookTableViewCell.m"
+            timestampString = "468220500.212966"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "213"
+            endingLineNumber = "213"
+            landmarkName = "-doStringAttribution:fromAllText:withHandler:"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>

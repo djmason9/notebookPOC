@@ -28,7 +28,7 @@
 
 - (BOOL) canPerformAction:(SEL)action withSender:(id)sender
 {
-    if (action == @selector(select:) && !_isSelectShowing) {
+    if ((action == @selector(select:) || action == @selector(selectAll:)) && !_isSelectShowing) {
         return YES;
     }
 
@@ -36,8 +36,14 @@
 }
 
 -(void)select:(id)sender{
-
+    
     [super select:sender];
+    _isSelectShowing = YES;
+}
+
+-(void)selectAll:(id)sender{
+    
+    [super selectAll:sender];
     _isSelectShowing = YES;
 }
 

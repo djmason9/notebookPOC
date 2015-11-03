@@ -41,14 +41,14 @@
     UIFont *attributeObliqueFont = [UIFont fontWithName:APPLICATION_STANDARD_ITALIC_FONT size:STANDARD_FONT_SIZE];
     UIFont *attributeBoldObliqueFont = [UIFont fontWithName:APPLICATION_BOLD_ITALIC_FONT size:STANDARD_FONT_SIZE];
     
-    NSString *htmlPattern = @"(<b>(.*?)</b>|<i>(.*?)</i>|<u>(.*?)</u>)";
+    NSString *htmlPattern = @"(<b>(.*?)</b>|<i>(.*?)</i>|<u>(.*?)</u>|<li>(.*?)</li>)";
     
     NSError *error = NULL;
     NSRange range = NSMakeRange(0, htmlString.length);
     NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:htmlPattern options:NSRegularExpressionCaseInsensitive error:&error];
     NSArray *matches = [regex matchesInString:htmlString options:NSMatchingReportProgress range:range];
-
-   
+    
+    
     NSMutableAttributedString *formattedString = [[NSMutableAttributedString alloc] initWithString:htmlString];
     
     [formattedString addAttribute:NSFontAttributeName value:attributeRegFont range:NSMakeRange(0,formattedString.length)]; //set every font to standard height first
@@ -58,9 +58,9 @@
         NSString* substringForMatch = [htmlString substringWithRange:match.range];
         NSMutableAttributedString *formattedSubString = [[NSMutableAttributedString alloc] initWithString:substringForMatch];
         
-         [formattedSubString addAttribute:NSFontAttributeName value:attributeRegFont range:NSMakeRange(0,formattedSubString.length)]; //set every font to standard height first
+        [formattedSubString addAttribute:NSFontAttributeName value:attributeRegFont range:NSMakeRange(0,formattedSubString.length)]; //set every font to standard height first
         
-//        NSLog(@"Extracted URL: %@",substringForMatch);
+        //        NSLog(@"Extracted URL: %@",substringForMatch);
         
         if([substringForMatch rangeOfString:@"<i>"].location == NSNotFound && [substringForMatch rangeOfString:@"<b>"].location != NSNotFound){//if bold
             [formattedSubString addAttribute:NSFontAttributeName value:attributeBoldFont range:NSMakeRange(0,substringForMatch.length)];
@@ -70,8 +70,23 @@
             [formattedSubString addAttribute:NSFontAttributeName value:attributeBoldObliqueFont range:NSMakeRange(0,substringForMatch.length)];
         }
         
+        if([substringForMatch rangeOfString:@"<li>"].location != NSNotFound){
+                        
+            NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
+            [paragraphStyle setParagraphSpacing:3];
+            paragraphStyle.headIndent = STANDARD_FONT_SIZE * 2;
+            paragraphStyle.firstLineHeadIndent = STANDARD_FONT_SIZE;
+            
+            NSTextTab *listTab = [[NSTextTab alloc] initWithTextAlignment:NSTextAlignmentNatural
+                                                                 location:STANDARD_FONT_SIZE * 2
+                                                                  options:nil];
+            paragraphStyle.tabStops = @[listTab];
+            
+            [formattedSubString addAttributes:@{NSParagraphStyleAttributeName: paragraphStyle} range:NSMakeRange(0,substringForMatch.length)];
+        }
+        
         if([substringForMatch rangeOfString:@"<u>"].location != NSNotFound){//underline
-             [formattedSubString addAttribute:NSUnderlineStyleAttributeName value:@(NSUnderlineStyleSingle) range:NSMakeRange(0,substringForMatch.length)];
+            [formattedSubString addAttribute:NSUnderlineStyleAttributeName value:@(NSUnderlineStyleSingle) range:NSMakeRange(0,substringForMatch.length)];
         }
         
         [formattedString replaceCharactersInRange:match.range withAttributedString:formattedSubString];
@@ -81,28 +96,37 @@
     return formattedString;
 }
 
+
+
 +(NSAttributedString *)stringByStrippingHTML:(NSAttributedString*)htmlString
 {
     NSRange range;
-    
+    BOOL isOrderedList = NO;
+    NSInteger count = 1;
     NSMutableAttributedString *string = [htmlString mutableCopy];
+    
+    if([[htmlString string] rangeOfString:@"<ol>"].location != NSNotFound){
+        isOrderedList = YES;
+    }
     
     while ((range = [[string mutableString] rangeOfString:@"<[^>]+>" options:NSRegularExpressionSearch]).location != NSNotFound)
     {
         NSString *subString = [[string mutableString] substringWithRange:range];
-        if([subString isEqualToString:@"<em>"])
-        {
-            NSRange range2 = [[string mutableString] rangeOfString:@"</em>"];
-            long length = range2.location - range.location - range.length;
-            long location = range.location + range.length;
-            NSRange boldRange = NSMakeRange(location, length);
-            
-            [string addAttribute:NSUnderlineStyleAttributeName value:[NSNumber numberWithInt:1] range:boldRange];
-            [string addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithRed:0.0f green:0.33f blue:0.0f alpha:1.0f] range:boldRange];
-        }
         
-        [[string mutableString] replaceCharactersInRange:range withString:@""];
+        if([subString isEqualToString:@"</li>"]){
+            [[string mutableString] replaceCharactersInRange:range withString:@"\n"];
+        }else if([subString isEqualToString:@"<li>"]){
+            
+            if(isOrderedList){
+                [[string mutableString] replaceCharactersInRange:range withString:[NSString stringWithFormat: @"%ld.\t ", (long)count]];
+                count ++;
+            }else
+                [[string mutableString] replaceCharactersInRange:range withString:@"\u25E6\t"];
+            
+        }else
+            [[string mutableString] replaceCharactersInRange:range withString:@""];
     }
+    
     return string;
 }
 

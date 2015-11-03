@@ -50,12 +50,12 @@ enum EditType{
    
     
     switch (selectedButton.tag) {
-        case BULLET:
-        {
-            NSLog(@"BULLET ACTION SENT! %@",selectedText);
-
-            break;
-        }
+//        case BULLET:
+//        {
+//            NSLog(@"BULLET ACTION SENT! %@",selectedText);
+//
+//            break;
+//        }
         case NUMBER_BULLET:
         {
             NSLog(@"NUMBER BULLET ACTION SENT! %@",selectedText);
@@ -151,6 +151,8 @@ enum EditType{
     BOOL italicOn =[((Etext2CustomEditUIButton*)[self viewWithTag:ITALIC]).userInfo[BUTTON_SELECTED] boolValue];
     BOOL underlineOn =[((Etext2CustomEditUIButton*)[self viewWithTag:UNDERLINE]).userInfo[BUTTON_SELECTED] boolValue];
     
+    BOOL bulletOn = [((Etext2CustomEditUIButton*)[self viewWithTag:BULLET]).userInfo[BUTTON_SELECTED] boolValue];
+    
     if(selectedRange.length>0) {
         [allString enumerateAttributesInRange:selectedRange options:NSAttributedStringEnumerationLongestEffectiveRangeNotRequired usingBlock:^(NSDictionary *attrs, NSRange range, BOOL *stop) {
             
@@ -164,19 +166,19 @@ enum EditType{
             
             for (id attributeType in attrs) {
                 //check for any underlines
-                if(/*[attributeType isEqualToString:@"NSUnderline"] ||*/ underlineOn){
+                if(underlineOn){
                         [attributeTypes addObject:@(Underline)];
                 }
                 //check for existing formatting.
                 if([attributeType isEqualToString:@"NSFont"]){
                     
-                    if(/*[((UIFont*)attrs[attributeType]).fontName rangeOfString:@"Oblique"].location != NSNotFound*/italicOn) {
-                            [attributeTypes addObject:@(Italic)];
-                    }else if (/*[((UIFont*)attrs[attributeType]).fontName rangeOfString:@"Heavy"].location != NSNotFound*/boldOn) {
-                            [attributeTypes addObject:@(Bold)];
+                    if(italicOn) {
+                        [attributeTypes addObject:@(Italic)];
+                    }else if (boldOn) {
+                        [attributeTypes addObject:@(Bold)];
                     }
                     
-                    if (/*[((UIFont*)attrs[attributeType]).fontName rangeOfString:@"HeavyOblique"].location != NSNotFound*/italicOn && boldOn) {
+                    if (italicOn && boldOn) {
                         [attributeTypes addObject:@(BoldOblique)];
                     }
                 }
@@ -188,6 +190,30 @@ enum EditType{
             
             NSString* substringForMatch = [[allString string] substringWithRange:selectedRange];
             NSMutableAttributedString *formattedSubString = [[NSMutableAttributedString alloc] initWithString:substringForMatch];
+            
+            //remove \u25E6 from string
+            if([substringForMatch rangeOfString:@"\u25E6"].location != NSNotFound){
+                substringForMatch = [substringForMatch stringByReplacingOccurrencesOfString:@"\u25E6\t" withString:@""];
+                formattedSubString = [[NSMutableAttributedString alloc] initWithString:substringForMatch];
+            }
+         
+            if(bulletOn){
+                NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
+                [paragraphStyle setParagraphSpacing:3];
+                paragraphStyle.headIndent = STANDARD_FONT_SIZE *2;
+                paragraphStyle.firstLineHeadIndent = STANDARD_FONT_SIZE;
+                
+                NSTextTab *listTab = [[NSTextTab alloc] initWithTextAlignment:NSTextAlignmentNatural
+                                                                     location:STANDARD_FONT_SIZE * 2
+                                                                      options:nil];
+                paragraphStyle.tabStops = @[listTab];
+                
+                
+                substringForMatch = [NSString stringWithFormat:@"\u25E6\t%@",substringForMatch];
+                formattedSubString = [[NSMutableAttributedString alloc] initWithString:substringForMatch];
+                
+                [formattedSubString addAttributes:@{NSParagraphStyleAttributeName: paragraphStyle} range:NSMakeRange(0,substringForMatch.length)];
+            }
             
             [formattedSubString addAttribute:NSFontAttributeName value:attributeNormalFont range:NSMakeRange(0,formattedSubString.length)];
             
@@ -207,6 +233,8 @@ enum EditType{
                 [formattedSubString addAttribute:NSUnderlineStyleAttributeName value:@(NSUnderlineStyleSingle) range:NSMakeRange(0,substringForMatch.length)];
             }
             
+            
+            
             [formattedString replaceCharactersInRange:selectedRange withAttributedString:formattedSubString];
             
             handler(formattedString);
@@ -217,6 +245,9 @@ enum EditType{
         
         //we are typing
         NSString *fontName;
+        UIFont *newFont = [UIFont fontWithName:fontName size:STANDARD_FONT_SIZE];
+        Etext2CustomUITextView *textView = (Etext2CustomUITextView*)[self viewWithTag:TEXT_BOX];
+        
         
         if(boldOn)
             fontName= APPLICATION_BOLD_FONT;
@@ -225,9 +256,13 @@ enum EditType{
         if(boldOn && italicOn)
             fontName = APPLICATION_BOLD_ITALIC_FONT;
         
-        UIFont *newFont = [UIFont fontWithName:fontName size:STANDARD_FONT_SIZE];
-        Etext2CustomUITextView *textView = (Etext2CustomUITextView*)[self viewWithTag:TEXT_BOX];
+        if(bulletOn){
+            NSLog(@"%@",allString);
+
+        }
+       
         [textView applyAttributeToTypingAttribute:newFont forKey:NSFontAttributeName];
+        
         
         if(underlineOn)
             [textView applyAttributeToTypingAttribute:@(NSUnderlineStyleSingle) forKey:NSUnderlineStyleAttributeName];
